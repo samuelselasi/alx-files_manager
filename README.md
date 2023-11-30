@@ -45,6 +45,7 @@ Enjoy!
 <details>
 
 <summary>Click to show/hide file contents</summary>
+
 ```
 {
   "name": "files_manager",
@@ -98,6 +99,7 @@ Enjoy!
 <details>
 
 <summary>Click to show/hide file contents</summary>
+
 ```
 module.exports = {
     env: {
@@ -144,6 +146,7 @@ module.exports = {
 <details>
 
 <summary>Click to show/hide file contents</summary>
+
 ```
 module.exports = {
     presets: [
