@@ -1,6 +1,8 @@
 # 0x04. Files manager
 #### `Back-end` `JavaScript` `ES6` `NoSQL` `MongoDB` `Redis` `NodeJS` `ExpressJS` `Kue`
 
+![images](https://github.com/samuelselasi/alx-files_manager/assets/85158665/ba83f480-f7aa-4312-9681-f3810e246226)
+
 This project is a summary of this back-end trimester: `authentication`, `NodeJS`, `MongoDB`, `Redis`, `pagination` and `background processing`.
 
 The objective is to **build a simple platform to upload and view files**:
