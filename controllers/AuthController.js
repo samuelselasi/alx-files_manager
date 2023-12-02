@@ -1,7 +1,6 @@
 // module that handles authentication token
 import { v4 as uuidv4 } from 'uuid';
 import sha1 from 'sha1';
-import { ObjectId } from 'mongodb';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
@@ -61,37 +60,6 @@ class AuthController {
       res.status(204).end();
     } catch (error) {
       console.error('Error in getDisconnect:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  }
-
-  static async getMe(req, res) {
-    try {
-      const { 'x-token': token } = req.headers;
-
-      if (!token) {
-        res.status(401).json({ error: 'Unauthorized' });
-        return;
-      }
-
-      const key = `auth_${token}`;
-      const userId = await redisClient.get(key);
-
-      if (!userId) {
-        res.status(401).json({ error: 'Unauthorized' });
-        return;
-      }
-
-      const user = await dbClient.client.db().collection('users').findOne({ _id: ObjectId(userId) });
-
-      if (!user) {
-        res.status(401).json({ error: 'Unauthorized' });
-        return;
-      }
-
-      res.status(200).json({ id: user._id.toString(), email: user.email });
-    } catch (error) {
-      console.error('Error in getMe:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
