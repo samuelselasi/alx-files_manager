@@ -1,6 +1,8 @@
 // Contains the create new user endpoint
 import sha1 from 'sha1';
 import Queue from 'bull';
+import { ObjectId } from 'mongodb';
+import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
 const userQueue = new Queue('email sending');
@@ -38,9 +40,34 @@ class UsersController {
   }
 
   static async getMe(req, res) {
-    const { user } = req;
+    try {
+      const { 'x-token': token } = req.headers;
 
-    res.status(200).json({ email: user.email, id: user._id.toString() });
+      if (!token) {
+        res.status(401).json({ error: 'Unauthorized: Missing X-Token header' });
+        return;
+      }
+
+      const key = `auth_${token}`;
+      const userId = await redisClient.get(key);
+
+      if (!userId) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
+
+      const user = await dbClient.client.db().collection('users').findOne({ _id: ObjectId(userId) });
+
+      if (!user) {
+        res.status(401).json({ error: 'Unauthorized: User not found' });
+        return;
+      }
+
+      res.status(200).json({ email: user.email, id: user._id.toString() });
+    } catch (error) {
+      console.error('Error in getMe:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
 }
 
