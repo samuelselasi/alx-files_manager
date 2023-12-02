@@ -34,5 +34,5 @@ class RedisClient {
   }
 }
 
-export const redisClient = new RedisClient();
+const redisClient = new RedisClient();
 export default redisClient;
