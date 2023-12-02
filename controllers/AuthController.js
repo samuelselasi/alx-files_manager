@@ -9,7 +9,7 @@ class AuthController {
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Basic ')) {
-        res.status(401).json({ error: 'Unauthorized: Missing or invalid Authorization header' });
+        res.status(401).json({ error: 'Unauthorized' });
         return;
       }
 
@@ -19,7 +19,7 @@ class AuthController {
 
       const user = await dbClient.client.db().collection('users').findOne({ email, password: sha1(password) });
       if (!user) {
-        res.status(401).json({ error: 'Unauthorized: Invalid email or password' });
+        res.status(401).json({ error: 'Unauthorized' });
         return;
       }
 
