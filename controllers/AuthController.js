@@ -44,7 +44,7 @@ class AuthController {
       const { 'x-token': token } = req.headers;
 
       if (!token) {
-        res.status(401).json({ error: 'Unauthorized: Missing X-Token header' });
+        res.status(401).json({ error: 'Unauthorized' });
         return;
       }
 
