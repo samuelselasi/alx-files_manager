@@ -36,7 +36,7 @@ class UsersController {
     const userId = insertData.insertedId.toString();
 
     userQueue.add({ userId });
-    res.status(201).json({ email, id: userId });
+    res.status(201).json({ id: userId, email });
   }
 
   static async getMe(req, res) {
@@ -44,7 +44,7 @@ class UsersController {
       const { 'x-token': token } = req.headers;
 
       if (!token) {
-        res.status(401).json({ error: 'Unauthorized: Missing X-Token header' });
+        res.status(401).json({ error: 'Unauthorized' });
         return;
       }
 
@@ -59,11 +59,11 @@ class UsersController {
       const user = await dbClient.client.db().collection('users').findOne({ _id: ObjectId(userId) });
 
       if (!user) {
-        res.status(401).json({ error: 'Unauthorized: User not found' });
+        res.status(401).json({ error: 'Unauthorized' });
         return;
       }
 
-      res.status(200).json({ email: user.email, id: user._id.toString() });
+      res.status(200).json({ id: user._id.toString(), email: user.email });
     } catch (error) {
       console.error('Error in getMe:', error);
       res.status(500).json({ error: 'Internal Server Error' });
