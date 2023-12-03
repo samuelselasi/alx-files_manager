@@ -149,6 +149,76 @@ class FilesController {
       .then(() => true)
       .catch(() => false);
   }
+
+  static async getShow(req, res) {
+    try {
+      const user = await FilesController.retrieveUserBasedOnToken(req);
+
+      if (!user) {
+        return res.status(401).send({
+          error: 'Unauthorized',
+        });
+      }
+
+      const fileId = req.params.id;
+
+      if (!fileId) {
+        return res.status(400).send({
+          error: 'Unauthorized',
+        });
+      }
+
+      const file = await FilesController.getFileById(fileId);
+
+      if (!file || file.userId.toString() !== user._id.toString()) {
+        return res.status(404).send({
+          error: 'Not found',
+        });
+      }
+
+      return res.status(200).send(file);
+    } catch (error) {
+      console.error('Error in getShow:', error);
+      return res.status(500).send({
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  static async getIndex(req, res) {
+    try {
+      const user = await FilesController.retrieveUserBasedOnToken(req);
+
+      if (!user) {
+        return res.status(401).send({
+          error: 'Unauthorized',
+        });
+      }
+
+      const parentId = req.query.parentId || 0;
+      const page = req.query.page || 0;
+      const pageSize = 20;
+
+      const files = await FilesController.getFilesByParentId(
+        user._id.toString(), parentId, page, pageSize,
+      );
+
+      return res.status(200).send(files);
+    } catch (error) {
+      console.error('Error in getIndex:', error);
+      return res.status(500).send({
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  static async getFilesByParentId(userId, parentId, page, pageSize) {
+    const filesCollection = dbClient.client.db().collection('files');
+    const skip = page * pageSize;
+    const query = { userId, parentId };
+    const files = await filesCollection.find(query).skip(skip).limit(pageSize).toArray();
+    return files;
+  }
 }
 
 export default FilesController;
