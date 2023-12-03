@@ -1,4 +1,5 @@
 // module that handles authentication token
+/* eslint-disable quote-props */
 import { v4 as uuidv4 } from 'uuid';
 import sha1 from 'sha1';
 import redisClient from '../utils/redis';
@@ -32,7 +33,7 @@ class AuthController {
       await redisClient.set(key, user._id.toString(), expirationTimeInSeconds);
       // await redisClient.setex(key, expirationTimeInSeconds, user._id.toString());
 
-      res.status(200).json({ token });
+      res.status(200).json({ 'token': token });
     } catch (error) {
       console.error('Error in getConnect:', error);
       res.status(500).json({ error: 'Internal Server Error' });
