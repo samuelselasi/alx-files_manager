@@ -86,7 +86,17 @@ class FilesController {
 
       const pathExists = await FilesController.pathExists(storeFolderPath);
       if (!pathExists) {
-        await fs.mkdir(storeFolderPath, { recursive: true });
+        // await fs.mkdir(storeFolderPath, { recursive: true });
+        const mkdirAsync = promisify(fs.mkdir);
+
+        try {
+          await mkdirAsync(storeFolderPath, { recursive: true });
+        } catch (error) {
+          console.error('Error creating directory:', error);
+          return res.status(500).send({
+            error: 'Internal Server Error',
+          });
+        }
       }
 
       fs.writeFile(filePath, decodedData, 'utf-8', (error) => {
