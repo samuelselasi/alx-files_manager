@@ -217,7 +217,13 @@ class FilesController {
     const skip = page * pageSize;
     const query = { userId, parentId };
     const files = await filesCollection.find(query).skip(skip).limit(pageSize).toArray();
-    return files;
+    // return files;
+    const mappedFiles = files.map((file) => {
+      const { _id, ...rest } = file;
+      return { id: _id.toString(), ...rest };
+    });
+
+    return mappedFiles;
   }
 }
 
