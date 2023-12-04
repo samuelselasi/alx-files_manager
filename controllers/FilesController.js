@@ -262,8 +262,8 @@ class FilesController {
       const fileId = req.params.id;
 
       if (!fileId) {
-        return res.status(400).send({
-          error: 'Bad Request',
+        return res.status(404).send({
+          error: 'Unauthorized',
         });
       }
 
@@ -299,8 +299,8 @@ class FilesController {
       const fileId = req.params.id;
 
       if (!fileId) {
-        return res.status(400).send({
-          error: 'Bad Request',
+        return res.status(404).send({
+          error: 'Unauthorized',
         });
       }
 
