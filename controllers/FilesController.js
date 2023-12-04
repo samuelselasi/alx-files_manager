@@ -248,6 +248,99 @@ class FilesController {
       throw new Error('Internal Server Error');
     }
   }
+
+  static async putPublish(req, res) {
+    try {
+      const user = await FilesController.retrieveUserBasedOnToken(req);
+
+      if (!user) {
+        return res.status(401).send({
+          error: 'Unauthorized',
+        });
+      }
+
+      const fileId = req.params.id;
+
+      if (!fileId) {
+        return res.status(400).send({
+          error: 'Bad Request',
+        });
+      }
+
+      const file = await FilesController.getFileById(fileId);
+
+      if (!file || file.userId.toString() !== user._id.toString()) {
+        return res.status(404).send({
+          error: 'Not found',
+        });
+      }
+
+      const updatedFile = await FilesController.updateFilePublishStatus(fileId, true);
+
+      return res.status(200).send(updatedFile);
+    } catch (error) {
+      console.error('Error in putPublish:', error);
+      return res.status(500).send({
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  static async putUnpublish(req, res) {
+    try {
+      const user = await FilesController.retrieveUserBasedOnToken(req);
+
+      if (!user) {
+        return res.status(401).send({
+          error: 'Unauthorized',
+        });
+      }
+
+      const fileId = req.params.id;
+
+      if (!fileId) {
+        return res.status(400).send({
+          error: 'Bad Request',
+        });
+      }
+
+      const file = await FilesController.getFileById(fileId);
+
+      if (!file || file.userId.toString() !== user._id.toString()) {
+        return res.status(404).send({
+          error: 'Not found',
+        });
+      }
+
+      const updatedFile = await FilesController.updateFilePublishStatus(fileId, false);
+
+      return res.status(200).send(updatedFile);
+    } catch (error) {
+      console.error('Error in putUnpublish:', error);
+      return res.status(500).send({
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  static async updateFilePublishStatus(fileId, isPublic) {
+    const filesCollection = dbClient.client.db().collection('files');
+    const result = await filesCollection.findOneAndUpdate(
+      { _id: ObjectId(fileId) },
+      { $set: { isPublic } },
+      { returnDocument: 'after' },
+    );
+
+    const updatedFile = result.value;
+
+    if (!updatedFile) {
+      throw new Error('Failed to update file status');
+    }
+
+    const { _id, localPath, ...rest } = updatedFile;
+
+    return { id: _id.toString(), ...rest };
+  }
 }
 
 export default FilesController;
