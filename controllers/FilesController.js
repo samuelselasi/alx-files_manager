@@ -263,7 +263,7 @@ class FilesController {
 
       if (!fileId) {
         return res.status(404).send({
-          error: 'Unauthorized',
+          error: 'Not found',
         });
       }
 
@@ -300,7 +300,7 @@ class FilesController {
 
       if (!fileId) {
         return res.status(404).send({
-          error: 'Unauthorized',
+          error: 'Not found',
         });
       }
 
