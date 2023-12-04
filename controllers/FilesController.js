@@ -68,13 +68,11 @@ class FilesController {
       if (type === 'folder') {
         const result = await FilesController.insertFile(newFile);
         const writeResp = {
-          id: result.insertedId,
+          id: result.insertedId.toString(),
           ...newFile,
         };
         delete writeResp._id;
         delete writeResp.localPath;
-        // newFile.id = result.insertedId;
-        // delete newFile._id;
         return res.status(201).send(writeResp);
       }
       const storeFolderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -186,7 +184,16 @@ class FilesController {
         });
       }
 
-      return res.status(200).send(file);
+      // return res.status(200).send(file);
+      const mappedFile = {
+        id: file._id.toString(),
+        ...file,
+      };
+
+      delete mappedFile._id;
+      delete mappedFile.localPath;
+
+      return res.status(200).send(mappedFile);
     } catch (error) {
       console.error('Error in getShow:', error);
       return res.status(500).send({
@@ -223,17 +230,22 @@ class FilesController {
   }
 
   static async getFilesByParentId(userId, parentId, page, pageSize) {
-    const filesCollection = dbClient.client.db().collection('files');
-    const skip = page * pageSize;
-    const query = { userId, parentId };
-    const files = await filesCollection.find(query).skip(skip).limit(pageSize).toArray();
-    // return files;
-    const mappedFiles = files.map((file) => {
-      const { _id, ...rest } = file;
-      return { id: _id.toString(), ...rest };
-    });
+    try {
+      const filesCollection = dbClient.client.db().collection('files');
+      const skip = page * pageSize;
+      const query = { userId, parentId };
+      const files = await filesCollection.find(query).skip(skip).limit(pageSize).toArray();
 
-    return mappedFiles;
+      const mappedFiles = files.map((file) => {
+        const { _id, localPath, ...rest } = file;
+        return { id: _id.toString(), ...rest };
+      });
+
+      return mappedFiles;
+    } catch (error) {
+      console.error('Error in getFilesByParentId:', error);
+      throw new Error('Internal Server Error');
+    }
   }
 }
 
