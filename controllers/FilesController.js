@@ -188,6 +188,7 @@ class FilesController {
       const mappedFile = {
         id: file._id.toString(),
         ...file,
+        parentId: file.parentId,
       };
 
       delete mappedFile._id;
@@ -233,7 +234,7 @@ class FilesController {
     try {
       const filesCollection = dbClient.client.db().collection('files');
       const skip = page * pageSize;
-      const query = { userId, parentId };
+      const query = { userId, parentId: parentId === '0' ? 0 : parentId };
       const files = await filesCollection.find(query).skip(skip).limit(pageSize).toArray();
 
       const mappedFiles = files.map((file) => {
