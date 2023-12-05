@@ -2,7 +2,7 @@
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-// import mime from 'mime-types';
+import mime from 'mime-types';
 import fs from 'fs';
 import { promisify } from 'util';
 import redisClient from '../utils/redis';
@@ -340,6 +340,63 @@ class FilesController {
     const { _id, localPath, ...rest } = updatedFile;
 
     return { id: _id.toString(), ...rest };
+  }
+
+  static async getFile(req, res) {
+    try {
+      const user = await FilesController.retrieveUserBasedOnToken(req);
+
+      const fileId = req.params.id;
+
+      if (!fileId) {
+        return res.status(404).send({
+          error: 'Not found',
+        });
+      }
+
+      const file = await FilesController.getFileById(fileId);
+
+      if (!file) {
+        return res.status(404).send({
+          error: 'Not found',
+        });
+      }
+
+      if (!file.isPublic && (!user || file.userId.toString() !== user._id.toString())) {
+        return res.status(404).send({
+          error: 'Not found',
+        });
+      }
+
+      if (file.type === 'folder') {
+        return res.status(400).send({
+          error: "A folder doesn't have content",
+        });
+      }
+
+      const filePath = file.localPath;
+
+      const pathExists = await FilesController.pathExists(filePath);
+      if (!pathExists) {
+        return res.status(404).send({
+          error: 'Not found',
+        });
+      }
+
+      const mimeType = mime.lookup(file.name);
+
+      const readFileAsync = promisify(fs.readFile);
+
+      const fileContent = await readFileAsync(filePath, 'utf-8');
+
+      res.setHeader('Content-Type', mimeType);
+      return res.status(200).send(fileContent);
+    } catch (error) {
+      console.error('Error in getFile:', error);
+      return res.status(500).send({
+        error: 'Internal Server Error',
+      });
+    }
   }
 }
 
