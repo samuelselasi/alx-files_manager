@@ -63,8 +63,7 @@ class UsersController {
         return;
       }
 
-      // res.status(200).json({ id: user._id.toString(), email: user.email });
-      res.status(200).json({ email: user.email, id: user._id.toString() });
+      res.status(200).json({ id: user._id.toString(), email: user.email });
     } catch (error) {
       console.error('Error in getMe:', error);
       res.status(500).json({ error: 'Internal Server Error' });
