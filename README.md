@@ -645,3 +645,25 @@ bob@dylan:~$ curl -XGET 0.0.0.0:5000/files/5f1e8896c7ba06511e683b25/data?size=25
 new_image.png: PNG image data, 250 x 272, 8-bit/color RGBA, non-interlaced
 bob@dylan:~$
 ```
+
+[10. Tests!](./tests/)
+
+Of course, a strong and stable project can not be good without tests.
+
+Create tests for `redisClient` and `dbClient`.
+
+Create tests for each endpoints:
+
+* `GET /status`
+* `GET /stats`
+* `POST /users`
+* `GET /connect`
+* `GET /disconnect`
+* `GET /users/me`
+* `POST /files`
+* `GET /files/:id`
+* `GET /files` (don’t forget the pagination)
+* `PUT /files/:id/publish`
+* `PUT /files/:id/unpublish`
+* `GET /files/:id/data`
+
